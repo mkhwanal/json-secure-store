@@ -40,7 +40,7 @@ jobs:
 
       - name: Upload build artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2 # Corrected version
         with:
           name: build-artifacts
           path: dist/
@@ -52,7 +52,7 @@ jobs:
 
       - name: Upload test coverage
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2 # Corrected version
         with:
           name: coverage
           path: coverage/
