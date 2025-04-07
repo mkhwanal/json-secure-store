@@ -37,10 +37,8 @@ jobs:
           echo "provenance=true" >> ~/.npmrc
           echo "provenance-url=https://provenance.npmjs.com" >> ~/.npmrc
 
-      - name: Npm Login
-        run: npm login --registry=https://registry.npmjs.org/ --scope=@your-scope --always-auth || echo "Already logged in"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Set up npm authentication
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Install dependencies
         run: npm ci
