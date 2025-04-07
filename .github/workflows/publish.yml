@@ -39,7 +39,7 @@ jobs:
           npm whoami || echo "❌ Unable to verify npm user" # Verify npm user
 
       - name: Install dependencies
-        run: npm ci
+        run: npm i
 
       - name: Run tests
         run: npm test
