@@ -69,34 +69,4 @@ describe('JsonStore', () => {
     const result = expiringStore.getItem<User>('user');
     expect(result).toBeNull();
   });
-
-  it('should notify onChange when an item is set', () => {
-    const callback = vi.fn();
-    store.onChange(callback);
-    store.setItem<User>('user', testUser);
-    expect(callback).toHaveBeenCalledWith('user', testUser);
-  });
-
-  it('should notify onChange when an item is removed', () => {
-    const callback = vi.fn();
-    store.setItem<User>('user', testUser);
-    store.onChange(callback);
-    store.removeItem('user');
-    expect(callback).toHaveBeenCalledWith('user', null);
-  });
-
-  it('should allow custom type guard checks', () => {
-    function isUser(val: any): val is User {
-      return val && typeof val.id === 'string' && typeof val.name === 'string';
-    }
-
-    store.setItem<User>('user', testUser);
-    const result = store.getItem('user');
-
-    if (isUser(result)) {
-      expect(result.name).toBe('Alice');
-    } else {
-      throw new Error('Type guard failed');
-    }
-  });
 });

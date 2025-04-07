@@ -134,3 +134,5 @@ export class JsonStore implements StorageAdapter {
         return this.storage;
     }
 }
+export { StorageType };
+
