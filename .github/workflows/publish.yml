@@ -30,6 +30,18 @@ jobs:
           registry-url: 'https://registry.npmjs.org/'
           cache: 'npm'
 
+      - name: Configure npm for provenance
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "always-auth=true" >> ~/.npmrc
+          echo "provenance=true" >> ~/.npmrc
+          echo "provenance-url=https://provenance.npmjs.com" >> ~/.npmrc
+
+      - name: Npm Login
+        run: npm login --registry=https://registry.npmjs.org/ --scope=@your-scope --always-auth || echo "Already logged in"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Install dependencies
         run: npm ci
 
