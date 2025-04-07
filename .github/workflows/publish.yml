@@ -18,8 +18,8 @@ jobs:
       - run: |
           echo "Creating .npmrc file..."
           echo "registry=https://registry.npmjs.org/" > ~/.npmrc
-          echo "@mkhwanal:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> ~/.npmrc
+          echo "registry=https://npm.pkg.github.com/" >> ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{secrets.NPM_TOKEN }}" >> ~/.npmrc
           cat ~/.npmrc  # Optional: print the .npmrc for debugging
       - run: npm ci
       - run: npm test
