@@ -14,10 +14,11 @@ jobs:
         with:
           node-version: 20
       - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-      - run: npm ci
-      - run: npm test
       - run: printenv
       - run: cat /home/runner/work/_temp/.npmrc
+      - run: npm ci
+      - run: npm test
+
 
   publish-npm:
     needs: build
