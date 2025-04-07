@@ -15,6 +15,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Validate environment variables
+        run: |
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "NPM_TOKEN is not set. Exiting."
+            exit 1
+          fi
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -31,7 +38,21 @@ jobs:
       - name: Build package
         run: npm run build
 
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: dist/
+
       - name: Publish to npm
         run: npm publish --provenance --access public 2>npm-debug.log || (cat npm-debug.log && exit 1)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Upload test coverage
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: coverage/
