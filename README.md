@@ -1,18 +1,20 @@
 # 🏦 json-secure-store
 
+[![npm version](https://badge.fury.io/js/json-secure-store.svg)](https://www.npmjs.com/package/json-secure-store)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A lightweight, TypeScript-first utility for storing JSON objects in `localStorage` or `sessionStorage`, with optional AES encryption, expiration, type-safe access, and change listeners. Framework-agnostic and blazing fast.
 
 ---
 
 ## ✨ Features
 
-- ✅ LocalStorage or SessionStorage  
-- 🔐 Optional AES encryption (using `crypto-js`)  
-- ⏳ Expiration support (TTL in milliseconds)  
-- 🧠 Type-safe via models/interfaces  
-- 📡 `onChange` listeners for reactive behavior  
-- ⚡ In-memory cache option for faster reads  
-- 🛆 Tiny bundle size, zero dependencies (except `crypto-js`)  
+- ✅ Local/session storage support
+- 🔐 Optional encryption (AES)
+- 🧠 Typed access with interfaces or models
+- ⏳ Expiration support (TTL)
+- 🔄 onChange listeners
+- ⚙️ Framework agnostic (works in React, Angular, Vue, plain JS, etc.)
 
 ---
 
@@ -24,31 +26,48 @@ npm install json-secure-store
 
 ---
 
-## 🚀 Quick Start
+## 🛠️ Usage
+### Basic Store / Get / Remove
 
 ```ts
-import { JsonStore, StorageType } from 'json-secure-store';
+import { JsonSecureStore } from 'json-secure-store';
 
-interface User {
-  id: string;
-  name: string;
-  age: number;
-}
+const store = new JsonSecureStore();
 
-const store = new JsonStore({
-  storageType: StorageType.Local,
-  encrypt: true,
-  encryptionKey: 'my-secret',
-  cache: true,
-  defaultTTL: 60_000, // 1 minute
-  namespace: 'app',
-});
+store.setItem('user', { name: 'Alice', role: 'admin' });
 
-store.setItem<User>('user', { id: '1', name: 'Alice', age: 30 });
+const user = store.getItem<{ name: string; role: string }>('user');
 
-const user = store.getItem<User>('user');
-console.log(user?.name);
+console.log(user?.name); // "Alice"
+
+store.removeItem('user');
 ```
+
+### With Encryption 🔐
+
+```ts
+const store = new JsonSecureStore({ secret: 'my-super-secret-key' });
+
+store.setItem('token', 'my-token');
+
+const token = store.getItem<string>('token');
+```
+
+### With Expiration
+
+```ts
+store.setItem('session', { userId: 123 }, { ttl: 60000 }); // expires in 60 seconds
+=
+```
+
+### Listen for Changes
+
+```ts
+store.onChange('theme', (newValue) => {
+  console.log('Theme changed:', newValue);
+});
+```
+
 
 ---
 
@@ -107,16 +126,6 @@ const user = store.getItem('user');
 if (isUser(user)) {
   console.log(user.name);
 }
-```
-
----
-
-## 📡 Change Listeners
-
-```ts
-store.onChange((key, value) => {
-  console.log(`Key changed: ${key}`, value);
-});
 ```
 
 ---
