@@ -1,6 +1,6 @@
 {
   "name": "json-secure-store",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Typed JSON storage wrapper for localStorage/sessionStorage with optional encryption.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
