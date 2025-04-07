@@ -1,6 +1,5 @@
 # 🏦 json-secure-store
 
-[![npm version](https://badge.fury.io/js/json-secure-store.svg)](https://www.npmjs.com/package/json-secure-store)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A lightweight, TypeScript-first utility for storing JSON objects in `localStorage` or `sessionStorage`, with optional AES encryption, expiration, type-safe access, and change listeners. Framework-agnostic and blazing fast.
