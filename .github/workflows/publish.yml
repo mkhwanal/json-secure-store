@@ -6,64 +6,26 @@ on:
       - 'v*.*.*' # Triggers on version tags like v1.0.0
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # Required for npm provenance
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Validate environment variables
-        run: |
-          echo "Checking NPM_TOKEN..."
-          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
-            echo "❌ NPM_TOKEN is not set. Exiting."
-            exit 1
-          fi
-
-      - name: Set up npm authentication
-        run: |
-          echo "Clearing existing .npmrc..."
-          rm -f ~/.npmrc
-          echo "Creating .npmrc with NPM_TOKEN..."
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          cat ~/.npmrc # Debugging the .npmrc content
-
-      - name: Verify npm configuration
-        run: |
-          echo "Verifying npm config..."
-          npm config list
-          npm whoami || echo "❌ Unable to verify npm user" # Verify npm user
-
-      - name: Install dependencies
-        run: npm i
-
-      - name: Run tests
-        run: npm test
-
-      - name: Build package
-        run: npm run build
-
-      - name: Upload build artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          name: build-artifacts
-          path: dist/
+          node-version: 20
+      - run: npm ci
+      - run: npm test
 
-      - name: Publish to npm
-        run: |
-          echo "Publishing package to npm..."
-          npm publish --provenance --access public || (cat npm-debug.log && exit 1)
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Upload test coverage
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage
-          path: coverage/
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN }}
