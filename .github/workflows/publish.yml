@@ -11,6 +11,7 @@ jobs:
     permissions:
       contents: read
       id-token: write # Required for npm provenance
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,7 +19,7 @@ jobs:
       - name: Validate environment variables
         run: |
           if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
-            echo "NPM_TOKEN is not set. Exiting."
+            echo "❌ NPM_TOKEN is not set. Exiting."
             exit 1
           fi
 
@@ -40,7 +41,7 @@ jobs:
 
       - name: Upload build artifacts
         if: always()
-        uses: actions/upload-artifact@v2 # Corrected version
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: dist/
@@ -52,7 +53,7 @@ jobs:
 
       - name: Upload test coverage
         if: success()
-        uses: actions/upload-artifact@v2 # Corrected version
+        uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: coverage/
