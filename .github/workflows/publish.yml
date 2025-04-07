@@ -3,7 +3,7 @@ name: Publish Package
 on:
   push:
     branches:
-       - main
+      - main
 
 jobs:
   publish:
@@ -20,15 +20,20 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        run: npm i
+        run: npm ci
 
-      - name: Build
+      - name: Build package
         run: npm run build
 
-      - name: Authenticate with npm
+      - name: Set up .npmrc
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Publish to npm
-        run: npm publish --access public
+        run: |
+          if npm publish --access public; then
+            echo "✅ Published successfully"
+          else
+            echo "⚠️ Already published or failed"
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
