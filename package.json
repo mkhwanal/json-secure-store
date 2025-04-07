@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "description": "Typed JSON storage wrapper for localStorage/sessionStorage with optional encryption.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:ui": "vitest --ui"
+  },
+  "keywords": [
+    "localStorage",
+    "sessionStorage",
+    "json",
+    "encryption",
+    "typescript"
+  ],
+  "author": "Luthando Mkhwanazi",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mkhwanal/json-secure-store"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/node": "^22.14.0",
+    "@vitest/ui": "^3.1.1",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
+  }
+}
