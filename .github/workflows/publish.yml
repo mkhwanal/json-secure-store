@@ -18,6 +18,7 @@ jobs:
 
       - name: Validate environment variables
         run: |
+          echo "Checking NPM_TOKEN..."
           if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
             echo "❌ NPM_TOKEN is not set. Exiting."
             exit 1
@@ -25,9 +26,17 @@ jobs:
 
       - name: Set up npm authentication
         run: |
-          echo "Removing any existing .npmrc"
+          echo "Clearing existing .npmrc..."
           rm -f ~/.npmrc
+          echo "Creating .npmrc with NPM_TOKEN..."
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          cat ~/.npmrc # Debugging the .npmrc content
+
+      - name: Verify npm configuration
+        run: |
+          echo "Verifying npm config..."
+          npm config list
+          npm whoami || echo "❌ Unable to verify npm user" # Verify npm user
 
       - name: Install dependencies
         run: npm ci
@@ -46,7 +55,9 @@ jobs:
           path: dist/
 
       - name: Publish to npm
-        run: npm publish --provenance --access public || (cat npm-debug.log && exit 1)
+        run: |
+          echo "Publishing package to npm..."
+          npm publish --provenance --access public || (cat npm-debug.log && exit 1)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
