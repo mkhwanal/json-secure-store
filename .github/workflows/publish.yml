@@ -19,9 +19,6 @@ jobs:
           echo "@mkhwanal:registry=https://npm.pkg.github.com/" >> ~/.npmrc
           echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> ~/.npmrc
           cat ~/.npmrc  # Optional: print the .npmrc for debugging
-      - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-      - run: printenv
-      - run: cat /home/runner/work/_temp/.npmrc
       - run: npm ci
       - run: npm test
 
