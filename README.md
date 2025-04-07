@@ -131,16 +131,6 @@ Uses [Vitest](https://vitest.dev/) for fast, browser-like testing.
 
 ---
 
-## 📁 Example Project
-
-Check out the [`examples/basic-usage`](./examples/basic-usage) folder to try it in a browser.
-
-```bash
-npx serve examples/basic-usage
-```
-
----
-
 ## 🗾 License
 
 MIT © 2025 mkhwanal
