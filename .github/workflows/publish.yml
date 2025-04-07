@@ -47,13 +47,6 @@ jobs:
           path: dist/
 
       - name: Publish to npm
-        run: npm publish --provenance --access public 2>npm-debug.log || (cat npm-debug.log && exit 1)
+        run: npm publish --provenance --access public || (cat npm-debug.log && exit 1)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Upload test coverage
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage
-          path: coverage/
