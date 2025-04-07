@@ -56,7 +56,6 @@ const token = store.getItem<string>('token');
 
 ```ts
 store.setItem('session', { userId: 123 }, { ttl: 60000 }); // expires in 60 seconds
-=
 ```
 
 ### Listen for Changes
