@@ -13,8 +13,8 @@ export interface StorageOptions {
 }
 
 export interface StorageAdapter {
-    setItem<T>(key: string, value: T): void;
-    getItem<T>(key: string): T | null;
+    setItem<T>(key: string, value: T): Promise<void>; // made async
+    getItem<T>(key: string): Promise<T | null>;       // made async
     removeItem(key: string): void;
     clear(): void;
     raw(): Storage;

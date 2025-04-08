@@ -5,9 +5,6 @@
 *.config.ts
 tsconfig.json
 
-# Ignore docs
-README.md
-
 # Ignore GitHub workflows
 .github/
 

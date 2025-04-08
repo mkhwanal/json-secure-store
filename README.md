@@ -1,11 +1,11 @@
 # json-secure-store
 
-A lightweight, TypeScript-first utility for storing JSON objects in `localStorage` or `sessionStorage`, with optional AES encryption, expiration, type-safe access, and change listeners. Framework-agnostic and blazing fast.
+A lightweight, TypeScript-first utility for storing JSON objects in `localStorage` or `sessionStorage`, with optional encryption, expiration, type-safe access, and change listeners. Framework-agnostic and blazing fast.
 
 ## ✨ Features
 
 - Local/session storage support
-- Optional encryption (AES)
+- Optional encryption (Web Crypto API, providing modern, dependency-free AES-GCM encryption with PBKDF2 key derivation.)
 - Typed access with interfaces or models
 - Expiration support (TTL)
 - Change listeners
@@ -42,13 +42,11 @@ store.removeItem('user');
 ```typescript
 import { JsonStore } from 'json-secure-store';
 
-const store = new JsonStore({ encrypt: true, encryptionKey: 'my-super-secret-key' });
+// Example: Using encryption (AES-GCM via Web Crypto API)
+const store = new JsonStore({ encrypt: true, encryptionKey: 'your-secret-key' });
 
-// Store a sensitive item
-store.setItem('token', 'my-token');
-
-// Retrieve the encrypted item
-const token = store.getItem<string>('token');
+await store.setItem('secureKey', { data: 'secret' });
+const decrypted = await store.getItem<{ data: string }>('secureKey');
 ```
 
 ### With Expiration
@@ -59,7 +57,7 @@ import { JsonStore } from 'json-secure-store';
 const store = new JsonStore();
 
 // Store an item that expires in 60 seconds
-store.setItem('session', { userId: 123 }, { ttl: 60000 });
+await store.setItem('session', { userId: 123 }, 60000);
 ```
 
 ### Switching Between localStorage and sessionStorage:

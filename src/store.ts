@@ -12,14 +12,6 @@ export class JsonStore implements StorageAdapter {
     private memoryCache: Map<string, any> = new Map();
 
     constructor(options?: StorageOptions) {
-        const {
-            storageType = StorageType.Local,
-            encrypt = false,
-            encryptionKey,
-            cache = false,
-            namespace,
-        } = options || {};
-
         const defaults: Required<StorageOptions> = {
             storageType: StorageType.Local,
             encrypt: false,
@@ -31,16 +23,10 @@ export class JsonStore implements StorageAdapter {
 
         this.options = Object.assign({}, defaults, options);
         this.storage = window[this.options.storageType];
-
-        if (this.options.encrypt && !this.options.encryptionKey) {
-            throw new Error('Encryption key is required when encryption is enabled.');
-        }
-
-        this.storage = window[storageType];
-        this.encrypt = encrypt;
-        this.encryptionKey = encryptionKey;
-        this.cache = cache;
-        this.namespace = namespace;
+        this.encrypt = this.options.encrypt;
+        this.encryptionKey = this.options.encryptionKey;
+        this.cache = this.options.cache;
+        this.namespace = this.options.namespace;
 
         if (this.encrypt && !this.encryptionKey) {
             throw new Error('Encryption key is required when encryption is enabled.');
@@ -59,55 +45,60 @@ export class JsonStore implements StorageAdapter {
         this.listeners.push(callback);
     }
 
-    setItem<T>(key: string, value: T): void {
+    async setItem<T>(key: string, value: T, ttl?: number): Promise<void> {
         const fullKey = this.buildKey(key);
-        const expiresAt = this.options.defaultTTL
+        const expiresAt = ttl
+            ? Date.now() + ttl
+            : this.options.defaultTTL
             ? Date.now() + this.options.defaultTTL
             : undefined;
-
+    
         const wrapper: StoredValue<T> = { data: value, expiresAt };
         let data = JSON.stringify(wrapper);
-
+    
         if (this.encrypt && this.encryptionKey) {
-            data = encryptData(data, this.encryptionKey);
+            data = await encryptData(data, this.encryptionKey);
         }
-
+    
         this.storage.setItem(fullKey, data);
-
+    
         if (this.cache) {
             this.memoryCache.set(fullKey, value);
         }
+    
+        this.notifyChange(key, value);
     }
 
-    getItem<T>(key: string): T | null {
+    async getItem<T>(key: string): Promise<T | null> {
         const fullKey = this.buildKey(key);
-
+    
         if (this.cache && this.memoryCache.has(fullKey)) {
             return this.memoryCache.get(fullKey);
         }
-
+    
         const raw = this.storage.getItem(fullKey);
         if (!raw) return null;
-
+    
         try {
             const data = this.encrypt && this.encryptionKey
-                ? decryptData(raw, this.encryptionKey)
+                ? await decryptData(raw, this.encryptionKey)
                 : raw;
-
+    
             const parsed: StoredValue<T> = JSON.parse(data);
-
+    
             if (parsed.expiresAt && Date.now() > parsed.expiresAt) {
                 this.removeItem(key);
                 return null;
             }
+    
             if (this.cache) {
-                this.memoryCache.set(fullKey, parsed);
+                this.memoryCache.set(fullKey, parsed.data);
             }
-
+    
             return parsed.data;
         } catch (err) {
-            console.error('Failed to decrypt or parse item:', err);
-            return null;
+            console.error(`Failed to retrieve or parse item for key "${key}":`, err);
+            throw new Error(`Failed to retrieve item for key "${key}".`);
         }
     }
 
@@ -117,22 +108,28 @@ export class JsonStore implements StorageAdapter {
         if (this.cache) {
             this.memoryCache.delete(fullKey);
         }
+        this.notifyChange(key, null);
     }
 
     clear(): void {
         const keysToRemove = Object.keys(this.storage).filter((key) =>
-            this.namespace ? key.startsWith(this.namespace + ':') : true
+            this.namespace ? key.startsWith(`${this.namespace}:`) : true
         );
-
+    
         keysToRemove.forEach((key) => this.storage.removeItem(key));
         if (this.cache) {
             this.memoryCache.clear();
         }
+    
+        keysToRemove.forEach((key) => {
+            const shortKey = this.namespace ? key.replace(`${this.namespace}:`, '') : key;
+            this.notifyChange(shortKey, null);
+        });
     }
 
     raw(): Storage {
         return this.storage;
     }
 }
-export { StorageType };
 
+export { StorageType };
