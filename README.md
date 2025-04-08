@@ -62,10 +62,10 @@ await store.setItem('session', { userId: 123 }, 60000);
 
 ### Switching Between localStorage and sessionStorage:
 ```typescript
-import { JsonStore } from 'json-secure-store';
+import { JsonStore, StorageType } from 'json-secure-store';
 
-const localStore = new JsonStore({ storageType: 'localStorage' });
-const sessionStore = new JsonStore({ storageType: 'sessionStorage' });
+const localStore = new JsonStore({ storageType: StorageType.Local });
+const sessionStore = new JsonStore({ storageType: StorageType.Session });
 
 // Store an item in localStorage
 localStore.setItem('user', { name: 'Alice' });
@@ -74,7 +74,18 @@ localStore.setItem('user', { name: 'Alice' });
 sessionStore.setItem('session', { sessionId: '12345' });
 ```
 
-Using Cache:
+### With Expiration
+
+```typescript
+import { JsonStore } from 'json-secure-store';
+
+const store = new JsonStore();
+
+// Store an item that expires in 60 seconds
+await store.setItem('session', { userId: 123 }, { ttl: 60000 });
+```
+
+### Using Cache
 ```typescript
 import { JsonStore } from 'json-secure-store';
 
@@ -98,6 +109,9 @@ const store = new JsonStore();
 store.onChange((key, newValue) => {
   console.log(`Changed key: ${key}, new value:`, newValue);
 });
+
+// Trigger a change
+store.setItem('user', { name: 'Alice' });
 ```
 
 ## Angular Integration Example
@@ -169,7 +183,7 @@ export class ExampleComponent implements OnInit {
 
 ```typescript
 export interface StorageOptions {
-  storageType?: 'localStorage' | 'sessionStorage';
+  storageType?: StorageType; // Use the enum
   encrypt?: boolean;
   encryptionKey?: string;
   cache?: boolean;
@@ -191,7 +205,7 @@ store.raw(): Storage;
 
 ## Encryption
 
-- Utilizes AES encryption via `crypto-js`.
+- Utilizes AES-GCM encryption via the Web Crypto API.
 - Requires `encrypt: true` and `encryptionKey` for encryption.
 
 ## Expiration (TTL)
